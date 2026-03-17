@@ -2,117 +2,69 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Norwegian Miner</title>
-    
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Mia PWA Gratis</title>
+
+    <link rel="manifest" href="manifest.json">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#F2F2F7">
+    <meta name="apple-mobile-web-app-title" content="Mia App">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Norwegian Miner","short_name":"NO Miner","start_url":"/","display":"standalone","background_color":"#F2F2F7","theme_color":"#007AFF","icons":[{"src":"https://img.icons8.com/color/512/norway.png","sizes":"512x512","type":"image/png"}]}'>
-    <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/norway.png">
+    <meta name="theme-color" content="#007bff">
 
     <style>
-        body, html {
-            margin: 0; padding: 0; height: 100%; overflow: hidden;
-            background-color: #F2F2F7; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            text-align: center;
         }
-        iframe {
-            border: none; width: 100vw; height: 100vh; display: none;
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        #auth-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; padding: 20px; text-align: center;
-        }
-        .pass-input {
-            padding: 15px; border-radius: 12px; border: 1px solid #CCC;
-            font-size: 18px; width: 80%; max-width: 300px; margin-bottom: 20px;
-            outline: none; text-align: center;
-            -webkit-appearance: none;
-        }
-        .btn-auth {
-            background: #007AFF; color: white; border: none; padding: 15px 30px;
-            border-radius: 12px; font-weight: 600; font-size: 16px; width: 80%; max-width: 300px;
-        }
-        #error-msg {
-            color: #FF3B30; font-size: 14px; margin-top: 10px; display: none;
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
         }
     </style>
 </head>
 <body>
 
-    <div id="auth-container">
-        <img src="https://img.icons8.com/color/96/norway.png" style="margin-bottom: 20px;">
-        <h2 style="font-weight: 800; letter-spacing: -0.5px;">Area Riservata</h2>
-        <p style="color: #8E8E93; margin-bottom: 30px;">Inserisci la password per accedere al tuo Miner personale.</p>
-        
-        <input type="password" id="password" class="pass-input" placeholder="Password">
-        <button onclick="checkPassword()" class="btn-auth">Accedi</button>
-        <div id="error-msg">Password errata. Riprova.</div>
+    <div class="card">
+        <h1>Benvenuto nella mia PWA!</h1>
+        <p>Questa app funziona anche offline grazie a GitHub Pages.</p>
+        <button onclick="alert('Funziono!')">Prova un'azione</button>
     </div>
 
-    <iframe id="app-frame" src=""></iframe>
-
     <script>
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Worker registrato!', reg))
-            .catch(err => console.log('Errore registrazione:', err));
-        });
-      }
-</script>
-    <script>
-        // --- CONFIGURAZIONE ---
-        // Sostituisci questo hash con quello della tua password (SHA-256)
-        const SECRET_HASH = "5e6d6c8b931e9c2b3e8c9b9b5f6a9c8b931e9c2b3e8c9b9b5f6a9c8b931e9c2b"; 
-        const GOOGLE_SCRIPT_URL = "INSERISCI_QUI_IL_TUO_URL_GOOGLE_SCRIPT";
-
-        async function hash(string) {
-            const utf8 = new TextEncoder().encode(string);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Il file sw.js deve essere nella stessa cartella di index.html
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registrato con successo:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Registrazione Service Worker fallita:', error);
+                    });
+            });
         }
-
-        async function checkPassword() {
-            const pwd = document.getElementById('password').value;
-            const hashedInput = await hash(pwd);
-            const errorMsg = document.getElementById('error-msg');
-            
-            if (hashedInput === SECRET_HASH) {
-                // SALVATAGGIO PERSISTENTE: Usiamo localStorage invece di sessionStorage
-                localStorage.setItem('miner_auth_token', hashedInput);
-                loadApp();
-            } else {
-                errorMsg.style.display = 'block';
-                document.getElementById('password').value = "";
-            }
-        }
-
-        function loadApp() {
-            document.getElementById('auth-container').style.display = 'none';
-            const frame = document.getElementById('app-frame');
-            frame.src = GOOGLE_SCRIPT_URL;
-            frame.style.display = 'block';
-        }
-
-        // AUTO-LOGIN: Controlla se esiste già un token salvato nel dispositivo
-        window.onload = function() {
-            const savedToken = localStorage.getItem('miner_auth_token');
-            if (savedToken === SECRET_HASH) {
-                loadApp();
-            }
-        };
-
-        // Gestione tasto Invio
-        document.getElementById('password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        });
     </script>
+
 </body>
 </html>
