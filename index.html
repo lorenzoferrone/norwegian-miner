@@ -207,7 +207,7 @@
     // Analisi Parola
     async function analyze() {
         const word = document.getElementById('wordInput').value.trim();
-        const key = localStorage.getItem('miner_key');
+        const key = localStorage.getItem('miner_auth_token');
         if (!word) return;
 
         showLoader(true);
@@ -232,7 +232,7 @@
     // Salvataggio nel Foglio
     async function save() {
         if (!currentData) return;
-        const key = localStorage.getItem('miner_key');
+        const key = localStorage.getItem('miner_auth_token');
         const btn = document.getElementById('saveBtn');
         
         btn.disabled = true;
