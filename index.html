@@ -253,6 +253,8 @@
 <script>
   let currentItem = null;
 
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBl6YfsDWRW8HWb3oALvdabsS-yH03qQPPGfIGEF-_uR1o57L4l6eFUPfy3vncvCX7/exec"
+
   function toggleLoader(show, text = "Analisi in corso...") {
     document.getElementById('loader').style.display = show ? 'block' : 'none';
     document.getElementById('loaderText').innerText = text;
@@ -295,6 +297,7 @@
     if (!val) return;
 
     toggleLoader(true, "Gemini sta analizzando...");
+    const key = localStorage.getItem('miner_key');
 
     try {
         const url = `${SCRIPT_URL}?action=analyze&word=${encodeURIComponent(word)}&key=${encodeURIComponent(key)}`;
