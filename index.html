@@ -293,8 +293,8 @@
     }
 
   async function startAnalysis() {
-    const val = document.getElementById('wordInput').value.trim();
-    if (!val) return;
+    const word = document.getElementById('wordInput').value.trim();
+    if (!word) return;
 
     toggleLoader(true, "Gemini sta analizzando...");
     const key = localStorage.getItem('miner_key');
