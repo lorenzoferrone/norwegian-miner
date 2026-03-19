@@ -278,6 +278,7 @@
         
         btn.disabled = true;
         btn.innerText = "Salvataggio...";
+        console.log(currentData)    
 
         try {
             const response = await fetch(SCRIPT_URL, {
@@ -294,6 +295,7 @@
                 reset();
             } else throw new Error(res.error);
         } catch (e) {
+          console.log(e)
             alert("Errore durante il salvataggio");
             btn.disabled = false;
             btn.innerText = "Salva nel Cloud";
