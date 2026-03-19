@@ -261,7 +261,7 @@
   }
 
     // Salvataggio nel Foglio
-  function saveData() {
+  async function saveData() {
         if (!currentData) return;
         const key = localStorage.getItem('miner_key');
         const btn = document.getElementById('saveBtn');
@@ -290,7 +290,7 @@
         }
     }
 
-  function startAnalysis() {
+  async function startAnalysis() {
     const val = document.getElementById('wordInput').value.trim();
     if (!val) return;
 
