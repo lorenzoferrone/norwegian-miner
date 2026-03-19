@@ -293,7 +293,7 @@
             console.log(res)
             if (res.success) {
                 alert("🎉 Salvato con successo!");
-                reset();
+                resetUI();
             } else throw new Error(res.error);
         } catch (e) {
           console.log(e)
