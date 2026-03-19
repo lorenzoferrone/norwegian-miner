@@ -192,6 +192,7 @@
         if (hashedInput === SECRET_HASH) {
             // SALVATAGGIO PERSISTENTE: Usiamo localStorage invece di sessionStorage
             localStorage.setItem('miner_auth_token', hashedInput);
+            localStorage.setItem('miner_key', pwd)
             loadApp(pwd);
         } else {
             errorMsg.style.display = 'block';
@@ -207,7 +208,7 @@
     // Analisi Parola
     async function analyze() {
         const word = document.getElementById('wordInput').value.trim();
-        const key = localStorage.getItem('miner_auth_token');
+        const key = localStorage.getItem('miner_key');
         if (!word) return;
 
         showLoader(true);
@@ -232,7 +233,7 @@
     // Salvataggio nel Foglio
     async function save() {
         if (!currentData) return;
-        const key = localStorage.getItem('miner_auth_token');
+        const key = localStorage.getItem('miner_key');
         const btn = document.getElementById('saveBtn');
         
         btn.disabled = true;
