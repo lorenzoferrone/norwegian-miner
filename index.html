@@ -1,140 +1,220 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Norwegian Miner</title>
+  <base target="_top">
+  <meta charset="utf-8">
+    <!-- Configurazione App Nativa per Android (Chrome) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="display" content="standalone">
+
+  <meta name="theme-color" content="#F2F2F7">
+    <!-- Ottimizzazione Viewport per prevenire zoom e scrolling orizzontale -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  
+
+  <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/norway.png">
+  <link rel="manifest" href="manifest.json">
+  
+  <style>
+    :root {
+      --primary: #007AFF;
+      --bg: #F2F2F7;
+      --card: #FFFFFF;
+      --text: #1C1C1E;
+      --secondary: #8E8E93;
+      --success: #34C759;
+      --danger: #FF3B30;
+      --accent: #5856D6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior-y: none;
+
+    }
+
+    .app-container { width: 100%; max-width: 450px; }
     
-    <!-- Configurazione PWA -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="NO Miner">
-    <meta name="theme-color" content="#F2F2F7">
+    .header { text-align: center; margin-bottom: 25px; }
+    .header h1 { font-size: 26px; font-weight: 800; margin: 0; }
+
+    /* Sezione Input */
+    .input-section {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 6px;
+      display: flex;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      padding: 14px;
+      font-size: 17px;
+      outline: none;
+      background: transparent;
+    }
+
+    .btn-search {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-search:active { transform: scale(0.95); }
+
+    .btn-search:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Spinner di caricamento */
+    #loader {
+      display: none;
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 4px solid rgba(0,122,255,0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Card dei Risultati */
+    #result-card {
+      display: none;
+      background: var(--card);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Griglia Info (Genere e Coniugazione) */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .info-item {
+      background: #F2F2F7;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .info-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .word-main { font-size: 28px; font-weight: 800; color: var(--primary); margin: 0 0 4px 0; }
+    .translation-text { font-size: 20px; margin-bottom: 20px; color: #333; font-weight: 500; }
+
+    /* Sezione Esempio */
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .example-container {
+      background: #F9F9FB;
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .ex-no { font-weight: 600; margin-bottom: 6px; line-height: 1.4; font-size: 15px; }
+    .ex-it { font-size: 14px; color: var(--secondary); font-style: italic; }
+
+    /* Sezione Note */
+    .notes-container {
+      background: #FFF9E6;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      border: 1px dashed #FFCC00;
+    }
+
+    .notes-text { font-size: 13px; color: #856404; line-height: 1.4; }
+
+    .btn-group { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; }
     
-    <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/norway.png">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="android-chrome-192x192.png">
+    .btn-action {
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-    <style>
-        :root {
-            --primary: #007AFF;
-            --bg: #F2F2F7;
-            --card: #FFFFFF;
-            --text: #1C1C1E;
-            --secondary: #8E8E93;
-            --success: #34C759;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container { width: 100%; max-width: 450px; padding-top: 40px; }
-        .hidden { display: none !important; }
-
-        /* Schermata Login */
-        .auth-card {
-            background: var(--card);
-            padding: 30px;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            margin-top: 60px;
-        }
-
-        /* UI Elementi */
-        .card {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            margin-bottom: 20px;
-        }
-
-        h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-        p { color: var(--secondary); margin-bottom: 24px; }
-
-        input {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid #E5E5EA;
-            border-radius: 14px;
-            font-size: 17px;
-            outline: none;
-            background: #F8F8F8;
-            margin-bottom: 12px;
-            transition: all 0.2s;
-        }
-
-        input:focus { border-color: var(--primary); background: #FFF; }
-
-        button {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-        }
-
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; margin-top: 20px; }
-        button:active { transform: scale(0.98); opacity: 0.9; }
-
-        /* Risultati */
-        .label { font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase; margin-bottom: 4px; }
-        .value { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
-        .example-box { background: #F8F8FA; padding: 15px; border-radius: 12px; margin-bottom: 10px; }
-        
-        #loader { text-align: center; padding: 20px; }
-        .spinner {
-            width: 30px; height: 30px;
-            border: 3px solid rgba(0,122,255,0.1);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+    .btn-save { background: var(--success); color: white; }
+    .btn-cancel { background: #E5E5EA; color: var(--text); }
+    
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    
-    <!-- Schermata di Autenticazione -->
-    <div id="login-screen" class="auth-card">
-        <img src="https://img.icons8.com/color/96/norway.png" width="80" style="margin-bottom:15px">
-        <h1>Area Privata</h1>
-        <p>Inserisci la tua password per accedere al sistema di mining.</p>
-        <input type="password" id="password" placeholder="Password" inputmode="text">
-        <button class="btn-primary" onclick="checkPassword()">Accedi</button>
-    </div>
+<div class="app-container">
+  <div class="header">
+    <h1>🇳🇴 Norwegian Miner</h1>
+  </div>
 
-    <!-- Schermata Principale App -->
-    <div id="app-screen" class="hidden">
-        <div class="card">
-            <h1>🇳🇴 Miner</h1>
-            <input type="text" id="wordInput" placeholder="Parola da cercare..." autocomplete="off" inputmode="search">
-            <button class="btn-primary" id="searchBtn" onclick="analyze()">Analizza con Gemini</button>
-        </div>
+  <div class="input-section">
+    <input type="text" id="wordInput" inputmode="search" placeholder="Inserisci parola o verbo..." onkeypress="if(event.key==='Enter') startAnalysis()">
+    <button id="searchBtn" class="btn-search" onclick="startAnalysis()">Vai</button>
+  </div>
 
-        <div id="loader" class="hidden">
-            <div class="spinner"></div>
-            <p style="margin-top:10px">Elaborazione in corso...</p>
-        </div>
+  <!-- Contenitore Spinner -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <div id="loaderText" style="color: var(--secondary); font-size: 14px;">Caricamento...</div>
+  </div>
 
   <!-- Card dei Risultati -->
   <div id="result-card">
@@ -164,71 +244,21 @@
     </div>
 
     <div class="btn-group">
-      <button class="btn-action btn-cancel" onclick="reset()">Scarta</button>
-      <button class="btn-action btn-save" id="saveBtn" onclick="save()">Salva</button>
+      <button class="btn-action btn-cancel" onclick="resetUI()">Scarta</button>
+      <button class="btn-action btn-save" id="saveBtn" onclick="saveData()">Salva</button>
     </div>
   </div>
-    </div>
 </div>
 
 <script>
-    // URL del tuo Google Apps Script (Deploy -> Web App)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBl6YfsDWRW8HWb3oALvdabsS-yH03qQPPGfIGEF-_uR1o57L4l6eFUPfy3vncvCX7/exec";
-    const SECRET_HASH = "d3d0b708cd483dc6d0d7126ad86f63c14ca26960d0e878b96dd4d9722f8a8075"; 
-    let currentData = null;
+  let currentItem = null;
 
-    async function hash(string) {
-        const utf8 = new TextEncoder().encode(string);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-        
-    async function checkPassword() {
-        const pwd = document.getElementById('password').value;
-        const hashedInput = await hash(pwd);
-        const errorMsg = document.getElementById('error-msg');
-            
-        if (hashedInput === SECRET_HASH) {
-            // SALVATAGGIO PERSISTENTE: Usiamo localStorage invece di sessionStorage
-            localStorage.setItem('miner_auth_token', hashedInput);
-            localStorage.setItem('miner_key', pwd)
-            loadApp(pwd);
-        } else {
-            errorMsg.style.display = 'block';
-            document.getElementById('password').value = "";
-        }
-    }
-
-    function loadApp() {
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app-screen').classList.remove('hidden');
-    }
-
-    // Analisi Parola
-    async function analyze() {
-        const word = document.getElementById('wordInput').value.trim();
-        const key = localStorage.getItem('miner_key');
-        if (!word) return;
-
-        showLoader(true);
-        
-        try {
-            const url = `${SCRIPT_URL}?action=analyze&word=${encodeURIComponent(word)}&key=${encodeURIComponent(key)}`;
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.error) throw new Error(data.error);
-
-            currentData = data;
-            render(data);
-        } catch (e) {
-            alert("Errore: " + e.message);
-            if (e.message.includes(" Accesso negato")) logout();
-        } finally {
-            showLoader(false);
-        }
-    }
+  function toggleLoader(show, text = "Analisi in corso...") {
+    document.getElementById('loader').style.display = show ? 'block' : 'none';
+    document.getElementById('loaderText').innerText = text;
+    document.getElementById('searchBtn').disabled = show;
+    if (show) document.getElementById('result-card').style.display = 'none';
+  }
 
     // Salvataggio nel Foglio
     async function save() {
@@ -260,46 +290,100 @@
         }
     }
 
-    // UI Helpers
-    function render(data) {
-        // Gestione fallback per i nuovi campi (nel caso Gemini non li mandi o il backend non sia aggiornato)
-        document.getElementById('resBadge').innerText = data.gender || 'n/a';
-        document.getElementById('resConj').innerText = data.conjugation || '-';
-        document.getElementById('resWord').innerText = data.word || '---';
-        document.getElementById('resTrans').innerText = data.translation || 'Non trovata';
-        document.getElementById('resExNo').innerText = data.sentence_no || '-';
-        document.getElementById('resExIt').innerText = data.sentence_en || '-';
-        document.getElementById('resNotes').innerText = data.notes || 'Nessuna nota particolare per questo termine.';
-        document.getElementById('result-card').style.display = 'block';
+    
+
+  function startAnalysis() {
+    const val = document.getElementById('wordInput').value.trim();
+    if (!val) return;
+
+    toggleLoader(true, "Gemini sta analizzando...");
+
+    try {
+        const url = `${SCRIPT_URL}?action=analyze&word=${encodeURIComponent(word)}&key=${encodeURIComponent(key)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error) throw new Error(data.error);
+
+        currentData = data;
+        render(data);
+    } catch (e) {
+        alert("Errore: " + e.message);
+    } finally {
+        toggleLoader(false);
+    }
   }
 
-    function reset() {
-        document.getElementById('wordInput').value = "";
-        document.getElementById('result-card').classList.add('hidden');
-        currentData = null;
+  function render(data) {
+    // Gestione fallback per i nuovi campi (nel caso Gemini non li mandi o il backend non sia aggiornato)
+    document.getElementById('resBadge').innerText = data.gender || 'n/a';
+    document.getElementById('resConj').innerText = data.conjugation || '-';
+    document.getElementById('resWord').innerText = data.word || '---';
+    document.getElementById('resTrans').innerText = data.translation || 'Non trovata';
+    document.getElementById('resExNo').innerText = data.sentence_no || '-';
+    document.getElementById('resExIt').innerText = data.sentence_en || '-';
+    document.getElementById('resNotes').innerText = data.notes || 'Nessuna nota particolare per questo termine.';
+    
+    document.getElementById('result-card').style.display = 'block';
+  }
+
+  function saveData() {
+    if (!currentItem) return;
+
+    const key = localStorage.getItem('miner_key');      
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.disabled = true;
+    saveBtn.innerText = "Salvataggio...";
+    
+    toggleLoader(true, "Scrittura nel foglio...");
+
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: "save",
+                key: key,
+                payload: currentData
+            })
+        });
+        const res = await response.json();
+        if (res.success) {
+            alert("🎉 Salvato con successo!");
+            reset();
+        } else throw new Error(res.error);
+    } catch (e) {
+        alert("Errore durante il salvataggio");
+        btn.disabled = false;
+        btn.innerText = "Salva nel Cloud";
     }
 
-    function showLoader(show) {
-        document.getElementById('loader').classList.toggle('hidden', !show);
-        document.getElementById('searchBtn').disabled = show;
-        if (show) document.getElementById('result-card').classList.add('hidden');
-    }
 
-    function logout() {
-        localStorage.removeItem('miner_key');
-        location.reload();
-    }
+  }
 
-    // AUTO-LOGIN: Controlla se esiste già un token salvato nel dispositivo
-    window.onload = function() {
-        const savedToken = localStorage.getItem('miner_auth_token');
-        if (savedToken === SECRET_HASH) {
-            loadApp();
-        }
-    };
+  function resetUI() {
+    document.getElementById('wordInput').value = "";
+    document.getElementById('result-card').style.display = 'none';
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.innerText = "Salva";
+    saveBtn.disabled = false;
+    currentItem = null;
+    toggleLoader(false);
+  }
+
+  
 </script>
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
